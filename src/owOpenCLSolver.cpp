@@ -101,7 +101,6 @@ void owOpenCLSolver::initializeOpenCL()
 		throw std::runtime_error( "No OpenCL platforms found" );
 	}
 	char cBuffer[1024];
-	cl_platform_id clSelectedPlatformID = NULL;
 	cl_platform_id cl_pl_id[10];
 	cl_uint n_pl;
 	clGetPlatformIDs(10,cl_pl_id,&n_pl);
@@ -164,21 +163,20 @@ void owOpenCLSolver::initializeOpenCL()
 	int value;
     unsigned long val2;
     size_t val3;
-	//uint deviceNum = 0;// causes "error C2065: 'uint' : undeclared identifier"
     unsigned int deviceNum = 0;
 	result = devices[deviceNum].getInfo(CL_DEVICE_NAME,&cBuffer);// CL_INVALID_VALUE = -30;
-	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_NAME [%d]: \t%s\n",plList, deviceNum, cBuffer);
+	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_NAME [%ul]: \t%s\n",plList, deviceNum, cBuffer);
 	if(strlen(cBuffer)<1000) strcpy(device_full_name,cBuffer);
 	result = devices[deviceNum].getInfo(CL_DEVICE_MAX_WORK_GROUP_SIZE,&val3);
-	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_MAX_WORK_GROUP_SIZE [%d]: \t%d\n",plList, deviceNum, val3);
+	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_MAX_WORK_GROUP_SIZE [%d]: \t%lu\n",plList, deviceNum, val3);
 	result = devices[deviceNum].getInfo(CL_DEVICE_MAX_COMPUTE_UNITS,&value);
 	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_MAX_COMPUTE_UNITS [%d]: \t%d\n",plList, deviceNum, value);
 	result = devices[deviceNum].getInfo(CL_DEVICE_GLOBAL_MEM_SIZE,&val2);
-	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_GLOBAL_MEM_SIZE [%d]: \t%d\n",plList, deviceNum, val2);
+	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_GLOBAL_MEM_SIZE [%d]: \t%lu\n",plList, deviceNum, val2);
 	result = devices[deviceNum].getInfo(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE,&val2);
-	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_GLOBAL_MEM_CACHE_SIZE [%d]: \t%d\n",plList, deviceNum, val2);
+	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_GLOBAL_MEM_CACHE_SIZE [%d]: \t%lu\n",plList, deviceNum, val2);
 	result = devices[deviceNum].getInfo(CL_DEVICE_LOCAL_MEM_SIZE,&val2);
-	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_LOCAL_MEM_SIZE [%d]: \t%d\n",plList, deviceNum, val2);
+	if(result == CL_SUCCESS) printf("CL_CONTEXT_PLATFORM [%d]: CL_DEVICE_LOCAL_MEM_SIZE [%d]: \t%lu\n",plList, deviceNum, val2);
 	
 	queue = cl::CommandQueue( context, devices[ deviceNum ], 0, &err );
 	if( err != CL_SUCCESS ){
@@ -307,13 +305,18 @@ unsigned int owOpenCLSolver::_runIndexPostPass()
 {
 	// Stage IndexPostPass
 	//28aug_Palyanov_start_block
-	copy_buffer_from_device( gridNextNonEmptyCellBuffer, gridCellIndex,(gridCellCount+1) * sizeof( unsigned int ) * 1 );
-	int recentNonEmptyCell = gridCellCount;
+	copy_buffer_from_device( gridNextNonEmptyCellBuffer, gridCellIndex,(gridCellCount+1) * sizeof( unsigned int ) );
+    unsigned int recentNonEmptyCell = gridCellCount;
 	for(int i=gridCellCount;i>=0;i--)
 	{
-		if(gridNextNonEmptyCellBuffer[i]==NO_CELL_ID)
+        //TODO: verify. this should never be the case.. after all how can unsigned be equal to -1?
+/*		if(gridNextNonEmptyCellBuffer[i]==NO_CELL_ID)
 			gridNextNonEmptyCellBuffer[i] = recentNonEmptyCell; 
 		else recentNonEmptyCell = gridNextNonEmptyCellBuffer[i];
+
+*/
+
+			gridNextNonEmptyCellBuffer[i] = recentNonEmptyCell; 
 	}
 	int err = copy_buffer_to_device( gridNextNonEmptyCellBuffer,gridCellIndexFixedUp,(gridCellCount+1) * sizeof( unsigned int ) * 1 );
 	return err;

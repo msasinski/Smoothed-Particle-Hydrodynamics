@@ -1,14 +1,7 @@
 #ifndef OW_OPENCL_SOLVER_H
 #define OW_OPENCL_SOLVER_H
 
-#pragma comment( lib, "opencl.lib" )							// opencl.lib
-
-#if defined(__APPLE__) || defined(__MACOSX)
-	#include "../inc/OpenCL/cl.hpp"
-//	#include <OpenCL/cl_d3d10.h>
-#else
-	#include <CL/cl.hpp>
-#endif
+#include <CL/cl.hpp>
 #include "owPhysicsConstant.h"
 
 extern int PARTICLE_COUNT;

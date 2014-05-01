@@ -171,35 +171,7 @@ void display(void)
 			endWinCoords();
 			}
 		}
-		else
-		{
-			//printf("[%d]",i);
-		}
 
-		/*
-		float rij;
-		
-		for(j = 0; j<252; j++)
-		{
-			rij = sqrt(  (p_cpp[i*4+0]-p_cpp[j*4+0])*(p_cpp[i*4+0]-p_cpp[j*4+0])
-						+(p_cpp[i*4+1]-p_cpp[j*4+1])*(p_cpp[i*4+1]-p_cpp[j*4+1])
-						+(p_cpp[i*4+2]-p_cpp[j*4+2])*(p_cpp[i*4+2]-p_cpp[j*4+2]) );
-
-			if(i!=j)
-			if( rij < 0.2f*r0)
-			{
-				//glBegin(GL_LINES);
-				glColor4b(255/2, 0, 255/2,255/2);//red
-				glBegin(GL_POINTS);
-				glVertex3f( (p_cpp[i*4+0]-XMAX/2)*sc , (p_cpp[i*4+1]-YMAX/2)*sc, (p_cpp[i*4+2]-ZMAX/2)*sc );
-				glVertex3f( (p_cpp[j*4+0]-XMAX/2)*sc , (p_cpp[j*4+1]-YMAX/2)*sc, (p_cpp[j*4+2]-ZMAX/2)*sc );
-				glEnd();
-				//printf(">>[%d]-[%d]<<",i,j);
-				//printf(" x= %f, y= %f, z= %f \n",p_cpp[i*4  ],p_cpp[i*4+1],p_cpp[i*4+2]);
-
-			}
-		}
-		/**/
 	}
 
 				
@@ -480,7 +452,6 @@ inline void drawScene()
 	s = "1E-" + ss.str() + "m";
 	glPrint3D( v8.x + 0.4f*sc , v8.y - 2.f * sc, v8.z, "0", m_font);
 	glPrint3D( v_s.x , v_s.y - 2.f * sc, v_s.z, s.c_str(), m_font);
-	int n = 1;
 	ss.str("");
 	while(v_s.x < XMAX/2*sc){
 		v_s.x += s_v * sc;
@@ -643,7 +614,6 @@ void renderInfo(int x, int y)
 	if(showRuler){
 		glColor3ub(255, 0, 0);
 		float s_v = 1 * sc_scale * (1 /( accuracy * simulationScale));
-		float temp_v = (float)glutGet(GLUT_WINDOW_WIDTH)/2.f;
 		float s_v_10 = s_v / 10;
 		std::stringstream ss;
 		std::string s;
