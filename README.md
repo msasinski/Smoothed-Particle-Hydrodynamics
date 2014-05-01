@@ -6,8 +6,8 @@ When driven by [Hodgkin Huxley dynamics](https://en.wikipedia.org/wiki/Hodgkin%E
 Sibernetic is primarily written in  C++ and OpenCL, it also provides a Python API.
 
 
-Compiling / running (Linux)
-------------------------------
+Compiling / running 
+--------------------
 
 **Linux**
 
@@ -32,7 +32,7 @@ You should see an output which looks something like this:
 ```
 Building file: ../src/PyramidalSimulation.cpp
 Invoking: GCC C++ Compiler
-
+```
 
 Then navigate to the top-level folder in the hierarchy (e.g `Smoothed-Particle-Hydrodynamics`) and set your `PYTHONPATH`:
 
@@ -42,16 +42,7 @@ export PYTHONPATH=$PYTHONPATH:'./src'
 
 Finally, to run, run the command:
 
-**Linux**:
 ```
 ./release/sph
 ```
 
-If you do not run from the top-level folder you will see an error which looks something like this:
-
-```
-Compilation failed: 
-"/tmp/OCLQ1BaOw.cl", line 8: catastrophic error: cannot open source file
-"src//owOpenCLConstant.h"
-#include "src//owOpenCLConstant.h"
-```
