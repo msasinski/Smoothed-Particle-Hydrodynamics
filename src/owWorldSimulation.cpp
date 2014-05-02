@@ -55,7 +55,7 @@ void drawScene();
 void renderInfo(int,int);
 void glPrint(float,float,const char *, void*);
 void glPrint3D(float,float,float,const char *, void*);
-//float muscle_activation_signal [10] = {0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f,0.f};
+
 void beginWinCoords(void)
 {
     glMatrixMode(GL_MODELVIEW);
@@ -106,7 +106,6 @@ void display(void)
     drawScene();
 
     int i,j,k;
-    //glColor3ub(255,255,255);//yellow
     if(!load_from_file)
         p_indexb = fluid_simulation->getParticleIndex_cpp();
     int pib;
@@ -127,7 +126,6 @@ void display(void)
     float dc, rho;
     for(i = 0; i<PARTICLE_COUNT; i++)
     {
-        //printf("[%d]",i);
         if(!load_from_file)
         {
             rho = d_cpp[ p_indexb[ i * 2 + 0 ] ];
@@ -190,13 +188,12 @@ void display(void)
     glLineWidth((GLfloat)0.1);
 
     int ecc=0;//elastic connections counter;
-    //if(generateInitialConfiguration)
     for(int i_ec=0; i_ec < numOfElasticP * MAX_NEIGHBOR_COUNT; i_ec++)
     {
         //offset = 0
         if((j=(int)ec_cpp[ 4 * i_ec + 0 ])>=0)
         {
-            i = (i_ec / MAX_NEIGHBOR_COUNT);// + (generateInitialConfiguration!=1)*numOfBoundaryP;
+            i = (i_ec / MAX_NEIGHBOR_COUNT);// 
 
             if(i<j)
             {
@@ -283,14 +280,6 @@ void display(void)
         }
     }
 
-    /*beginWinCoords();
-    char label[300];
-    glRasterPos2f (0.01F, 0.05F);
-    glColor4b(255/2, 255/2, 0, 255/2);
-    sprintf(label,"elastic connections count: %d, elementary membranes count: %d",ecc,numOfMembranes);
-    glPrint( 1, 50, label, m_font);
-    endWinCoords();*/
-
 
     //draw membranes
     if(!load_from_file)
@@ -305,17 +294,6 @@ void display(void)
         j = md_cpp [i_m*3+1];
         k = md_cpp [i_m*3+2];
 
-        /*
-        glBegin(GL_LINES);
-        glVertex3f( (p_cpp[i*4]-XMAX/2)*sc , (p_cpp[i*4+1]-YMAX/2)*sc, (p_cpp[i*4+2]-ZMAX/2)*sc );
-        glVertex3f( (p_cpp[j*4]-XMAX/2)*sc , (p_cpp[j*4+1]-YMAX/2)*sc, (p_cpp[j*4+2]-ZMAX/2)*sc );
-
-        glVertex3f( (p_cpp[j*4]-XMAX/2)*sc , (p_cpp[j*4+1]-YMAX/2)*sc, (p_cpp[j*4+2]-ZMAX/2)*sc );
-        glVertex3f( (p_cpp[k*4]-XMAX/2)*sc , (p_cpp[k*4+1]-YMAX/2)*sc, (p_cpp[k*4+2]-ZMAX/2)*sc );
-
-        glVertex3f( (p_cpp[k*4]-XMAX/2)*sc , (p_cpp[k*4+1]-YMAX/2)*sc, (p_cpp[k*4+2]-ZMAX/2)*sc );
-        glVertex3f( (p_cpp[i*4]-XMAX/2)*sc , (p_cpp[i*4+1]-YMAX/2)*sc, (p_cpp[i*4+2]-ZMAX/2)*sc );
-        glEnd();*/
 
         glBegin(GL_LINES);
         glVertex3f( ((p_cpp[i*4]+p_cpp[j*4]+4*p_cpp[k*4])/6-XMAX/2)*sc , ((p_cpp[i*4+1]+p_cpp[j*4+1]+4*p_cpp[k*4+1])/6-YMAX/2)*sc, ((p_cpp[i*4+2]+p_cpp[j*4+2]+4*p_cpp[k*4+2])/6-ZMAX/2)*sc );
@@ -330,7 +308,6 @@ void display(void)
     }/**/
 
 
-    //glEnd();//???
 
     glLineWidth((GLfloat)1.0);
 
@@ -419,7 +396,6 @@ inline void drawScene()
     glVertex3d(v4.x,v4.y,v4.z); //glColor3ub(0,255,0);//green
     glVertex3d(v1.x,v1.y,v1.z);
 
-    //glColor3ub(0,0,255);//blue
     glVertex3d(v1.x,v1.y,v1.z); //glColor3ub(255,255,0);//yellow
     glVertex3d(v5.x,v5.y,v5.z);
 
@@ -501,7 +477,6 @@ void renderInfo(int x, int y)
 
 
         sprintf(label,"Muscle activation signals:          // demo: use keys '1' to '9' to activate/deactivate first nine muscles in array ");
-//		glRasterPos2f (0.01F, 0.05F);
         glPrint( 0 , 32 , label, m_font);
 
         i_shift = 0;
@@ -735,13 +710,10 @@ void mouse_motion (int x, int y)
         // middle = translate
         camera_trans[0] += dx / 100.0f;
         camera_trans[1] -= dy / 100.0f;
-        //camera_trans[2] += (dy / 100.0f) * 0.5f * fabs(camera_trans[2]);
     }
     if(buttonState == 2)
     {
         // middle = translate
-        //camera_trans[0] += dx / 100.0f;
-        //camera_trans[1] -= dy / 100.0f;
         camera_trans[2] += (dy / 100.0f) * 0.5f * fabs(camera_trans[2]);
     }
     old_x=x;
@@ -764,7 +736,6 @@ extern float *muscle_activation_signal_cpp;
 void respond_key_pressed(unsigned char key, int x, int y)
 {
     int shift=0;
-    //for(shift=0;shift<=72;shift+=72)
     {
 
         if(key=='1')
@@ -772,7 +743,6 @@ void respond_key_pressed(unsigned char key, int x, int y)
             if(muscle_activation_signal_cpp[0+shift]<=0.5f)
                 muscle_activation_signal_cpp[0+shift] = 1.f;//+= 0.1f;
             else muscle_activation_signal_cpp[0+shift] = 0.f;
-            //if(muscle_activation_signal_cpp[0]>1.f) muscle_activation_signal_cpp[0] = 1.f;
         }
 
         if(key=='2')
@@ -780,7 +750,6 @@ void respond_key_pressed(unsigned char key, int x, int y)
             if(muscle_activation_signal_cpp[1+shift]<=0.5f)
                 muscle_activation_signal_cpp[1+shift] = 1.f;//+= 0.1f;
             else muscle_activation_signal_cpp[1+shift] = 0.f;
-            //if(muscle_activation_signal_cpp[1]>1.f) muscle_activation_signal_cpp[1] = 1.f;
         }
 
         if(key=='3')
@@ -788,7 +757,6 @@ void respond_key_pressed(unsigned char key, int x, int y)
             if(muscle_activation_signal_cpp[2+shift]<=0.5f)
                 muscle_activation_signal_cpp[2+shift] = 1.f;//+= 0.1f;
             else muscle_activation_signal_cpp[2+shift] = 0.f;
-            //if(muscle_activation_signal_cpp[2]>1.f) muscle_activation_signal_cpp[2] = 1.f;
         }
 
         if(key=='4')
@@ -796,7 +764,6 @@ void respond_key_pressed(unsigned char key, int x, int y)
             if(muscle_activation_signal_cpp[3+shift]<=0.5f)
                 muscle_activation_signal_cpp[3+shift] = 1.f;//+= 0.1f;
             else muscle_activation_signal_cpp[3+shift] = 0.f;
-            //if(muscle_activation_signal_cpp[3]>1.f) muscle_activation_signal_cpp[3] = 1.f;
         }
 
         if(key=='5')
@@ -856,7 +823,6 @@ void idle (void)
     glutSetWindow (winIdMain);
     glutPostRedisplay ();
 }
-//static char label[1000];                            /* Storage for current string   */
 
 void Timer(int value)
 {
@@ -864,8 +830,6 @@ void Timer(int value)
     {
         owHelper::loadConfigurationFromFile_experemental(p_cpp,ec_cpp,md_cpp,iteration);
         iteration++;
-        //if(iteration >= iterationCount)
-        //	exit(0);
     }
     else
     {
@@ -875,20 +839,7 @@ void Timer(int value)
     glutTimerFunc(TIMER_INTERVAL*0, Timer, 0);
     glutPostRedisplay();
 }
-/*
-void SetProjectionMatrix(void){
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();									// Current projection matrix is dropped to identity matrix
-	glFrustum(-1, 1, -1, 1, 3, 15*3);						// Set up perspective projection
-}
-void SetModelviewMatrix(void){
-     glMatrixMode(GL_MODELVIEW);
-     glLoadIdentity();
-     glTranslatef(0.0, 0.0, -8.0);
-     glRotatef(0*10.0, 1.0, 0.0, 0.0);
-     glRotatef(0.0, 0.0, 1.0, 0.0);
-}
-*/
+
 GLvoid resize(GLsizei width, GLsizei height)
 {
 
@@ -911,18 +862,6 @@ GLvoid resize(GLsizei width, GLsizei height)
     else
         glFrustum(-1, 1, -1/aspectRatio, 1/aspectRatio, 3, 45);
 
-
-
-    ///// Model View ///////
-    //glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
-    //glRotatef(0.0, 1.0, 0.0, 0.0);
-    //glRotatef(0.0, 0.0, 1.0, 0.0);
-    //gluPerspective(30.0f,  1/(width/height), 1.0f, 15.0f);
-    //glOrtho(0, width, 0, height, -1, 1);
-    //SetProjectionMatrix();
-    //SetModelviewMatrix();
-    //glMatrixMode(GL_MODELVIEW);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -1012,17 +951,4 @@ void run(int argc, char** argv, const bool with_graphics, const bool load_to)
             helper->refreshTime();
         }
     }
-    /*	{
-    		double step_time = 0, total_work_time = 0;
-    		int steps_cnt = 0;
-    		while(steps_cnt<100){
-    			step_time = fluid_simulation->simulationStep();
-    			total_work_time += step_time;
-    			helper->refreshTime();
-    			steps_cnt++;
-    		}
-
-    		printf("\ntotal calculation time (1000 steps) = %f ms\n",total_work_time);
-    	}*/
-
 }

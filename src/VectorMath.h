@@ -169,12 +169,6 @@ public:
         ort1 = v2.unit();
         ort2 = (v1%v2).unit();
         ort3 = (ort2%ort1).unit();
-        /*
-        		Vector3D t1 = ort1*(v1*ort1);
-        		Vector3D t2 = ort2*(v1*ort3)*sin(alpha);
-        		Vector3D t3 = ort3*(v1*ort3)*cos(alpha);
-        		Vector3D r = t1+t2+t3;
-        */
         return ort1*(v1*ort1) + ort2*(v1*ort3)*sin(alpha) + ort3*(v1*ort3)*cos(alpha);
     }
 };

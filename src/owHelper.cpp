@@ -10,10 +10,6 @@
 #include <string>
 #include <vector>
 
-#if defined(__APPLE__) || defined (__MACOSX)
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-#endif
 
 using namespace std;
 
@@ -44,18 +40,10 @@ owHelper::~owHelper(void)
 }
 void owHelper::refreshTime()
 {
-#if defined(_WIN32) || defined (_WIN64)
-    QueryPerformanceFrequency(&frequency);	// get ticks per second
-    QueryPerformanceCounter(&t1);			// start timer
-    t0 = t1;
-#elif defined(__linux__)
     clock_gettime(CLOCK_MONOTONIC_RAW, &t1);
     t0 = t1;
-#elif defined(__APPLE__)
-    t1 = mach_absolute_time();
-    t0 = t1;
-#endif
 }
+
 //For output float buffer
 //Create File in which line element_size elements forn buffer
 //global_size - size of buffer / element_size
@@ -110,7 +98,6 @@ void owHelper::log_bufferi(const int * buffer, const int element_size, const int
 
 int generateWormShell(int stage, int i_start,float *position_cpp, float *velocity_cpp, int &numOfMembranes, int *membraneData_cpp)
 {
-    //return 0;
     if( !((stage==0)||(stage==1)) ) return 0;
 
     float alpha;
@@ -155,9 +142,6 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
             tip = 1;    //0.707 = sqrt(2)/2
             wormBodyRadius = 0.707f*r0;
         }
-
-        //alpha = 2*asin(0.5*r0/wormBodyRadius);//in radians
-        //angle = alpha;
 
         elasticLayers = 1;
 
@@ -425,7 +409,6 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
                             float *pkk;
 
                             // ii and jj on prevSlice, kk - on currSlice
-                            // 11111111111111111111111111111111111111111111111111111111111111111
                             for(q=0; q<prevSlice_pCount; q++)
                             {
                                 if(q==0)
@@ -508,11 +491,9 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
                                 membraneData_cpp [mc*3+2] = kk;//array_j[k];
                                 mc++;
                             }
-                            // 11111111111111111111111111111111111111111111111111111111111111111
 
 
                             // ii and jj on currSlice, kk - on prevSlice
-                            // 22222222222222222222222222222222222222222222222222222222222222222
                             for(q=0; q<currSlice_pCount; q++)
                             {
                                 if(q==0)
@@ -595,19 +576,18 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
                                 membraneData_cpp [mc*3+2] = kk;//array_j[k];
                                 mc++;
                             }
-                            // 22222222222222222222222222222222222222222222222222222222222222222
                         }
                     }
 
                     prevSlice_pCount = currSlice_pCount;
                     prevSlice_start = currSlice_start;
-                }//////////
+                }
             }
 
             wormBodyRadius -= r0;
             elasticLayers++;
         }
-    }////////////////////////////////////////////////////
+    }
 
     if(stage==1)
     {
@@ -621,11 +601,8 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
         }
     }
 
-    //if(stage==0) numOfMembranes /= 2;//remove this line when development of this function is complete
 
     return pCount;
-
-    // makeworm
 }
 
 int generateInnerWormLiquid(int stage, int i_start,float *position_cpp, float *velocity_cpp)
@@ -651,7 +628,6 @@ int generateInnerWormLiquid(int stage, int i_start,float *position_cpp, float *v
     pCount = 0;
 
     float jmin=-100.f,jmax=100.f;
-    //float jmin=-10.f,jmax=10.f;
 
     float j;
 
@@ -659,7 +635,6 @@ int generateInnerWormLiquid(int stage, int i_start,float *position_cpp, float *v
     for(j=jmin; j<=jmax; j+=0.85f)	// number of cross-slices of the worm, in direction from head to tail. -
         // 1..-1 for example will give 3 slices in the middle of the worm
     {
-        ////////////////////////////////////////////////////
 
         elasticLayers = 2;
         wormBodyRadius = 6.0f*r0*sqrt(max(1.f-(1.0e-4f)*j*j,0.f)) - r0*(1+0.85);
@@ -686,19 +661,6 @@ int generateInnerWormLiquid(int stage, int i_start,float *position_cpp, float *v
             }
             else
             {
-                /*
-                if(wormBodyRadius>0.3*r0)
-                {
-                	if(stage==1)
-                	{
-                		positionVector = position_cpp + 4 * (pCount+i_start);
-                		positionVector[ 0 ] = xc;
-                		positionVector[ 1 ] = yc;
-                		positionVector[ 2 ] = zc + r0*j;
-                		positionVector[ 3 ] = 1.1f;// liquid
-                	}
-                	pCount++;
-                }*/
                 break;
             }
 
@@ -798,16 +760,6 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
     int nx = (int)( ( XMAX - XMIN ) / r0 ); //X
     int ny = (int)( ( YMAX - YMIN ) / r0 ); //Y
     int nz = (int)( ( ZMAX - ZMIN ) / r0 ); //Z
-
-    /*
-
-    mks
-    int nEx = 5*0;//7
-    int nEy = 3*0;//4
-    int nEz = 9*0;//25
-    int nMuscles = 5;
-    int nM,nMi,nMj;
-    */
 
     int wormIndex_start,wormIndex_end;
     int numOfMembraneParticles = generateWormShell(0,0,position_cpp,velocity_cpp, numOfMembranes, membraneData_cpp);
@@ -1043,16 +995,11 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
         int j;
         int ecc_total = 0;
         int array_j[MAX_NEIGHBOR_COUNT];
-        //float ix,iy,iz,jx,jy,jz;
-        //int j_count=0;
         int muscleCounter = 0;
         int m_index[10640];
-        //mks: float m_number[10640];
         float WXC = XMAX*0.5f;
         float WYC = YMAX*0.3f;
         float WZC = ZMAX*0.5f;
-        //int sm_cnt = 0;
-        //int array_k[MAX_NEIGHBOR_COUNT];
         for(i=numOfElasticP-numOfMembraneParticles; i<numOfElasticP; i++)
         {
             float dx2,dy2,dz2,r2_ij,r_ij;
@@ -1077,8 +1024,7 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
                     r2_ij = dx2 + dy2 + dz2;
                     r_ij = (float)sqrt(r2_ij);
 
-                    //if(r_ij<=r0*2*sqrt(/*3.2*/1.7))//grid = 1.5*r0
-                    if(r_ij<=r0*sqrt(/*2.3*/2.7/*2.7*/))//grid = 1.0*r0
+                    if(r_ij<=r0*sqrt(2.7))//grid = 1.0*r0
                     {
                         elasticConnectionsData_cpp[ 4 * ( MAX_NEIGHBOR_COUNT * i + ecc) + 0 ] = ((float)j) + 0.1f;		// index of j-th particle in a pair connected with spring
                         elasticConnectionsData_cpp[ 4 * ( MAX_NEIGHBOR_COUNT * i + ecc) + 1 ] = r_ij*simulationScale*0.95;	// resting distance; that's why we use float type for elasticConnectionsData_cpp
@@ -1478,16 +1424,6 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
         }
 
 
-        /*
-        if(muscleCounter==10408)
-        {
-        	//for(i=0;i<muscleCounter;i++)
-
-        	//m_number[m_index[0]] = 1.2f;
-        	elasticConnectionsData_cpp[m_index[3]] = 1.2f;
-
-        }*/
-
 
         //membraneData - the list containing triplets of indexes of particles forming triangular membranes; size: numOfMembranes*3
         //particleMembranesList - the list containing for each particle(involved in membranes) its list of these membranes indexes (which are stored in membraneData array)
@@ -1502,10 +1438,6 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
                 {
                     particleMembranesList_cpp [particle_index] = _mc/3;
                     break;//if there are no free cells, break, because we are limited with MAX_MEMBRANES_INCLUDING_SAME_PARTICLE per particle
-                }
-                else
-                {
-                    //_mc = _mc; //https://github.com/openworm/OpenWorm/issues/152
                 }
             }
         }
@@ -1602,11 +1534,6 @@ void owHelper::loadConfiguration(float *position_cpp, float *velocity_cpp, float
         {
             ifstream elasticConectionsFile ("./configuration/elasticconnections.txt");
             elasticConnections = new float[ 4 * numOfElasticP * MAX_NEIGHBOR_COUNT ];
-            /*int numElasticConnections = 0;
-            for(i=0;i<numOfElasticP * MAX_NEIGHBOR_COUNT;i++)
-            {
-            	elasticConnections[ 4 * i + 0 ] = NO_PARTICLE_ID;
-            }*/
             i = 0;
             float  jd, rij0, val1, val2;// Elastic connection particle jd - jparticle rij0 - distance between i and j, val1, val2 - doesn't have any useful information yet
             if( elasticConectionsFile.is_open() )

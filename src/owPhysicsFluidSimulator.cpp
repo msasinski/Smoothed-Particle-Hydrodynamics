@@ -11,24 +11,24 @@ extern int iterationCount=0;
 extern int numOfElasticConnections = 0;
 extern int numOfLiquidP = 0;
 extern int numOfElasticP = 0;
-/*extern*/
 int numOfBoundaryP = 0;
 extern int numOfMembranes = 0;
 int * _particleIndex;
 unsigned int * gridNextNonEmptyCellBuffer;
 extern int gridCellCount;
 extern float * muscle_activation_signal_cpp;
-//extern bool load_to_file;
 int iter_step = 10;
 
 //mv
 //need to find a more elegant design for this - at the moment the use of a global
 //is pretty ugly:
+
+//MKS: re:^ - this whole code is ugly, so what's the problem? :)
+
 PyramidalSimulation simulation;
 
 owPhysicsFluidSimulator::owPhysicsFluidSimulator(owHelper * helper)
 {
-    //int generateInitialConfiguration = 1;//1 to generate initial configuration, 0 - load from file
 
     try
     {
@@ -88,13 +88,11 @@ double owPhysicsFluidSimulator::simulationStep(const bool load_to)
 {
     //PCISPH algorithm
     int iter = 0;//PCISPH prediction-correction iterations conter
-    //if(iterationCount!=0) return 0.0;//uncomment this line to stop movement of the scene
     helper->refreshTime();
     printf("\n[[ Step %d ]]\n",iterationCount);
     try
     {
         //SEARCH FOR NEIGHBOURS PART
-//		ocl_solver->_runClearBuffers();								helper->watch_report("_runClearBuffers: \t%9.3f ms\n");
         ocl_solver->_runHashParticles();
         helper->watch_report("_runHashParticles: \t%9.3f ms\n");
         ocl_solver->_runSort();
@@ -113,7 +111,6 @@ double owPhysicsFluidSimulator::simulationStep(const bool load_to)
         ocl_solver->_run_pcisph_computeElasticForces();
         do
         {
-            //printf("\n^^^^ iter %d ^^^^\n",iter);
             ocl_solver->_run_pcisph_predictPositions();
             ocl_solver->_run_pcisph_predictDensity();
             ocl_solver->_run_pcisph_correctPressure();
@@ -155,8 +152,6 @@ double owPhysicsFluidSimulator::simulationStep(const bool load_to)
             }
         }
         iterationCount++;
-        //for(int i=0;i<MUSCLE_COUNT;i++) { muscle_activation_signal_cpp[i] *= 0.9f; }
-
         //mv
         vector<float> muscle_vector = simulation.run();
         for(int i=0; i<MUSCLE_COUNT; i++)
@@ -186,7 +181,6 @@ owPhysicsFluidSimulator::~owPhysicsFluidSimulator(void)
     delete [] particleIndex_cpp;
     delete [] muscle_activation_signal_cpp;
     if(membraneData_cpp) delete [] membraneData_cpp;
-    //if(particleMembranesList_cpp) delete [] particleMembranesList_cpp;
     ocl_solver->~owOpenCLSolver();
 }
 
@@ -227,6 +221,5 @@ float calcDelta()
     }
     sum1 = sum1_x*sum1_x + sum1_y*sum1_y + sum1_z*sum1_z;
     double result = 1.0 / (beta * gradWspikyCoefficient * gradWspikyCoefficient * (sum1 + sum2));
-    //return  1.0f / (beta * gradWspikyCoefficient * gradWspikyCoefficient * (sum1 + sum2));
     return (float)result;
 }

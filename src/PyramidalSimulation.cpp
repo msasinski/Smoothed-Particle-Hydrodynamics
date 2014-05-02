@@ -1,12 +1,3 @@
-// to compile and run (temp notes with hardcoded paths)
-// run the following commands from inside curdir:
-//
-// $ export PYTHONPATH="/home/mike/dev/cpp_pyramidal_integration/"
-//OR
-//export PYTHONPATH=$PYTHONPATH:/home/mike/dev/muscle_model/pyramidal_implementation/
-// $ g++ main.cpp -l python2.7 -o sim -I /usr/include/python2.7/
-// $ ./sim
-
 #include <Python.h>
 #include <iostream>
 #include "PyramidalSimulation.h"
@@ -29,9 +20,7 @@ int PyramidalSimulation::setup()
     // Convert the file name to a Python string.
     pName = PyString_FromString(python_module);
     const char* s = PyString_AsString(pName);
-    printf("[debug] pName = \"%s\"\n",s);
     const char* s2 = Py_GetPath();
-    printf("[debug] PyPath = \"%s\"\n",s2);
 
     // Import the file as a Python module.
     pModule = PyImport_Import(pName);
@@ -81,18 +70,11 @@ vector<float> PyramidalSimulation::unpackPythonList(PyObject* pValue)
 
 vector<float> PyramidalSimulation::run()
 {
-    // Call a method of the class
-//	  pValue = PyObject_CallMethod(pInstance, "rrun
-//	  un", NULL);
-    printf("!!!checkpoint001!!!\n");
     pValue = PyObject_CallMethod(pInstance, "run", NULL);
-    printf("!!!checkpoint002!!!\n");
     if(PyList_Check(pValue))
     {
-        printf("!!!checkpoint003.1!!!\n");
         vector<float> value_array;
         value_array = PyramidalSimulation::unpackPythonList(pValue);
-        printf("!!!checkpoint003!!!\n");
         return value_array;
 
     }
@@ -100,11 +82,8 @@ vector<float> PyramidalSimulation::run()
 
     else
     {
-        printf("!!!checkpoint004.1!!!\n");
         vector<float> single_element_array(0);
         single_element_array[0] = PyFloat_AsDouble(pValue);
-        printf("!!!checkpoint004!!!\n");
         return single_element_array;
     }
-    printf("!!!checkpoint005!!!\n");
 };
