@@ -5,15 +5,16 @@
 
 using namespace std;
 
-class PyramidalSimulation{
+class PyramidalSimulation
+{
 
- private:
-  PyObject *pName, *pModule, *pDict, *pFunc, *pValue, *pClass, *pInstance;
-  vector<float> unpackPythonList(PyObject*);
+private:
+    PyObject *pName, *pModule, *pDict, *pFunc, *pValue, *pClass, *pInstance;
+    vector<float> unpackPythonList(PyObject*);
 
- public:
-  int setup();
-  vector<float> run();
+public:
+    int setup();
+    vector<float> run();
 
 };
 
