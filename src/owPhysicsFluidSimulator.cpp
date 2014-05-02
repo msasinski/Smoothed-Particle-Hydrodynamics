@@ -1,12 +1,13 @@
+#include "PyramidalSimulation.h"
 #include "owPhysicsFluidSimulator.h"
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
-#include "PyramidalSimulation.h"
+#include "sph.h"
 
 float calcDelta();
 extern const float delta = calcDelta();
-extern int iterationCount = 0;
+extern int iterationCount=0;
 extern int numOfElasticConnections = 0;
 extern int numOfLiquidP = 0;
 extern int numOfElasticP = 0;
@@ -133,7 +134,7 @@ double owPhysicsFluidSimulator::simulationStep(const bool load_to)
         //mv
         vector<float> muscle_vector = simulation.run();
         for(int i=0; i<MUSCLE_COUNT; i++){
-        	for (long index = 0; index < muscle_vector.size(); index++){
+        	for (unsigned long index = 0; index < muscle_vector.size(); index++){
         		muscle_activation_signal_cpp[index] = muscle_vector[index];
         	}
         }

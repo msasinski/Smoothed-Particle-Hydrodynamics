@@ -1,6 +1,6 @@
+#include <Python.h>
 #ifndef PYRAMIDALSIMULATION_H
 #define PYRAMIDALSIMULATION_H
-#include <Python.h>
 #include <vector>
 
 using namespace std;
