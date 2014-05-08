@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
-
+#include <algorithm>
 #include "owOpenCLSolver.h"
 
 const float xmin = XMIN;
@@ -253,7 +253,7 @@ unsigned int owOpenCLSolver::_runHashParticles()
 unsigned int owOpenCLSolver::_runSort()
 {
     copy_buffer_from_device( _particleIndex, particleIndex, PARTICLE_COUNT * 2 * sizeof( int ) );
-    qsort( _particleIndex, PARTICLE_COUNT, 2 * sizeof( int ), myCompare );
+    std::sort(_particleIndex, _particleIndex + sizeof _particleIndex/sizeof _particleIndex[0],std::greater<int>() );
     copy_buffer_to_device( _particleIndex, particleIndex, PARTICLE_COUNT * 2 * sizeof( int ) );
     return 0;
 }
@@ -625,15 +625,7 @@ unsigned int owOpenCLSolver::_run_pcisph_integrate(int iterationCount)
     return err;
 }
 //end Kernels definition
-//Auxiliary methods
-int myCompare( const void * v1, const void * v2 )
-{
-    int * f1 = (int *)v1;
-    int * f2 = (int *)v2;
-    if( f1[ 0 ] < f2[ 0 ] ) return -1;
-    if( f1[ 0 ] > f2[ 0 ] ) return +1;
-    return 0;
-}
+
 void owOpenCLSolver::create_ocl_kernel(const char *name, cl::Kernel &k )
 {
     int err;
