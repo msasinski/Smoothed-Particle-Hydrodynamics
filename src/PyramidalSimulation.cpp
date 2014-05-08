@@ -8,8 +8,12 @@
 
 using namespace std;
 
-int PyramidalSimulation::setup()
+
+PyramidalSimulation::PyramidalSimulation()
 {
+
+//int PyramidalSimulation::setup()
+//{
 
     char python_module[] = "main_sim";
     char pyClass[] = "muscle_simulation";
@@ -47,7 +51,6 @@ int PyramidalSimulation::setup()
         cout << "Pyramidal simulation class not callable!"<<endl;
     }
 
-    return 0;
 };
 
 vector<float> PyramidalSimulation::unpackPythonList(PyObject* pValue)

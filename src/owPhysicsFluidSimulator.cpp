@@ -39,7 +39,6 @@ owPhysicsFluidSimulator::owPhysicsFluidSimulator(owHelper * helper)
             // LOAD FROM FILE
             owHelper::preLoadConfiguration();
         //mv
-        simulation.setup();
         //=======================
 
         position_cpp = new float[ 4 * PARTICLE_COUNT ];

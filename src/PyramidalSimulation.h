@@ -15,7 +15,7 @@ private:
 public:
     int setup();
     vector<float> run();
-
+    PyramidalSimulation(); 
 };
 
 #endif
