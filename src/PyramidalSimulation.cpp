@@ -19,8 +19,6 @@ int PyramidalSimulation::setup()
     PyObject* pName;
     // Convert the file name to a Python string.
     pName = PyString_FromString(python_module);
-    const char* s = PyString_AsString(pName);
-    const char* s2 = Py_GetPath();
 
     // Import the file as a Python module.
     pModule = PyImport_Import(pName);
