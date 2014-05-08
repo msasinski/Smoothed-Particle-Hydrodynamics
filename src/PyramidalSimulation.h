@@ -9,11 +9,10 @@ class PyramidalSimulation
 {
 
 private:
-    PyObject *pName, *pModule, *pDict, *pFunc, *pValue, *pClass, *pInstance;
+    PyObject *pName, *pModule, *pValue, *pClass, *pInstance;
     vector<float> unpackPythonList(PyObject*);
 
 public:
-    int setup();
     vector<float> run();
     PyramidalSimulation(); 
 };

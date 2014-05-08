@@ -17,10 +17,11 @@ PyramidalSimulation::PyramidalSimulation()
 
     char python_module[] = "main_sim";
     char pyClass[] = "muscle_simulation";
-
+    char pyMethod[] = "run";    
     // Initialize the Python interpreter
     Py_Initialize();
     PyObject* pName;
+
     // Convert the file name to a Python string.
     pName = PyString_FromString(python_module);
 
@@ -45,6 +46,7 @@ PyramidalSimulation::PyramidalSimulation()
         pInstance = PyObject_CallObject(pClass, NULL);
         if( PyErr_Occurred() ) PyErr_Print();
         cout << "Pyramidal simulation class loaded!"<<endl;
+        pValue = PyObject_CallMethod(pInstance, pyMethod, NULL);
     }
     else
     {
@@ -58,7 +60,7 @@ vector<float> PyramidalSimulation::unpackPythonList(PyObject* pValue)
 
     Py_ssize_t size = PyList_Size(pValue);
     vector<float> test(96); //needs to change!
-    printf("====\n");
+
     for (Py_ssize_t i = 0; i < size; i++)
     {
         float value;
@@ -71,16 +73,12 @@ vector<float> PyramidalSimulation::unpackPythonList(PyObject* pValue)
 
 vector<float> PyramidalSimulation::run()
 {
-    pValue = PyObject_CallMethod(pInstance, "run", NULL);
     if(PyList_Check(pValue))
     {
         vector<float> value_array;
         value_array = PyramidalSimulation::unpackPythonList(pValue);
         return value_array;
-
     }
-
-
     else
     {
         vector<float> single_element_array(0);
