@@ -8,7 +8,6 @@ extern int numOfElasticP;
 extern int numOfBoundaryP;
 extern int numOfMembranes;
 extern int iterationCount;
-extern bool load_from_file;
 
 int old_x=0, old_y=0;	// Used for mouse event
 float camera_trans[] = {0, 0, -8.0};
@@ -106,46 +105,37 @@ void display(void)
     drawScene();
 
     int i,j,k;
-    if(!load_from_file)
-        p_indexb = fluid_simulation->getParticleIndex_cpp();
+    p_indexb = fluid_simulation->getParticleIndex_cpp();
     int pib;
     int err_coord_cnt = 0;
-    if(!load_from_file)
-        for(i=0; i<PARTICLE_COUNT; i++)
-        {
-            pib = p_indexb[2*i + 1];
-            p_indexb[2*pib + 0] = i;
-        }
+
+    for(i=0; i<PARTICLE_COUNT; i++)
+    {
+        pib = p_indexb[2*i + 1];
+        p_indexb[2*pib + 0] = i;
+    }
+
     glPointSize(3.f);
     glBegin(GL_POINTS);
-    if(!load_from_file)
-    {
-        p_cpp = fluid_simulation->getPosition_cpp();
-        d_cpp = fluid_simulation->getDensity_cpp();
-    }
+    p_cpp = fluid_simulation->getPosition_cpp();
+    d_cpp = fluid_simulation->getDensity_cpp();
+
     float dc, rho;
     for(i = 0; i<PARTICLE_COUNT; i++)
     {
-        if(!load_from_file)
-        {
-            rho = d_cpp[ p_indexb[ i * 2 + 0 ] ];
-            if( rho < 0 ) rho = 0;
-            if( rho > 2 * rho0) rho = 2 * rho0;
-            dc = 100.f * ( rho - rho0 ) / rho0 ;
-            if(dc>1.f) dc = 1.f;
-            //  R   G   B
-            glColor4f(  0,  0,  1, 1.0f);//blue
-            if(!load_from_file)
-            {
-                if( (dc=100*(rho-rho0*1.00f)/rho0) >0 )	glColor4f(   0,  dc,   1,1.0f);//cyan
-                if( (dc=100*(rho-rho0*1.01f)/rho0) >0 )	glColor4f(   0,   1,1-dc,1.0f);//green
-                if( (dc=100*(rho-rho0*1.02f)/rho0) >0 )	glColor4f(  dc,   1,   0,1.0f);//yellow
-                if( (dc=100*(rho-rho0*1.03f)/rho0) >0 )	glColor4f(   1,1-dc,   0,1.0f);//red
-                if( (dc=100*(rho-rho0*1.04f)/rho0) >0 )	glColor4f(   1,   0,   0,1.0f);
-            }
-        }
-        else
-            glColor4f(  0,  0,  1, 1.0f);//blue
+        rho = d_cpp[ p_indexb[ i * 2 + 0 ] ];
+        if( rho < 0 ) rho = 0;
+        if( rho > 2 * rho0) rho = 2 * rho0;
+        dc = 100.f * ( rho - rho0 ) / rho0 ;
+        if(dc>1.f) dc = 1.f;
+        //  R   G   B
+        glColor4f(  0,  0,  1, 1.0f);//blue
+        if( (dc=100*(rho-rho0*1.00f)/rho0) >0 )	glColor4f(   0,  dc,   1,1.0f);//cyan
+        if( (dc=100*(rho-rho0*1.01f)/rho0) >0 )	glColor4f(   0,   1,1-dc,1.0f);//green
+        if( (dc=100*(rho-rho0*1.02f)/rho0) >0 )	glColor4f(  dc,   1,   0,1.0f);//yellow
+        if( (dc=100*(rho-rho0*1.03f)/rho0) >0 )	glColor4f(   1,1-dc,   0,1.0f);//red
+        if( (dc=100*(rho-rho0*1.04f)/rho0) >0 )	glColor4f(   1,   0,   0,1.0f);
+
         if((int)p_cpp[i*4 + 3] != BOUNDARY_PARTICLE /*&& (int)p_cpp[i*4 + 3] != ELASTIC_PARTICLE*/)
         {
             glBegin(GL_POINTS);
@@ -182,8 +172,7 @@ void display(void)
     }
 
 
-    if(!load_from_file)
-        ec_cpp = fluid_simulation->getElasticConnectionsData_cpp();
+    ec_cpp = fluid_simulation->getElasticConnectionsData_cpp();
 
     glLineWidth((GLfloat)0.1);
 
@@ -282,8 +271,7 @@ void display(void)
 
 
     //draw membranes
-    if(!load_from_file)
-        md_cpp = fluid_simulation->getMembraneData_cpp();
+    md_cpp = fluid_simulation->getMembraneData_cpp();
 
     glColor4b(0, 200/2, 150/2, 255/2/*alpha*/);
 
@@ -826,15 +814,8 @@ void idle (void)
 
 void Timer(int value)
 {
-    if(load_from_file)
-    {
-        owHelper::loadConfigurationFromFile_experemental(p_cpp,ec_cpp,md_cpp,iteration);
-        iteration++;
-    }
-    else
-    {
-        calculationTime = fluid_simulation->simulationStep();
-    }
+
+    calculationTime = fluid_simulation->simulationStep();
     // Re-register for next callback
     glutTimerFunc(TIMER_INTERVAL*0, Timer, 0);
     glutPostRedisplay();
@@ -904,18 +885,8 @@ void draw(void)
 void run(int argc, char** argv, const bool with_graphics, const bool load_to)
 {
     helper = new owHelper();
-    if(!load_from_file)
-    {
-        fluid_simulation = new owPhysicsFluidSimulator(helper);
-    }
-    else
-    {
-        muscle_activation_signal_cpp = new float [MUSCLE_COUNT];
-        for(int i=0; i<MUSCLE_COUNT; i++)
-        {
-            muscle_activation_signal_cpp[i] = 0.f;
-        }
-    }
+    fluid_simulation = new owPhysicsFluidSimulator(helper);
+
     if(with_graphics)
     {
         glutInit(&argc, argv);
@@ -940,8 +911,7 @@ void run(int argc, char** argv, const bool with_graphics, const bool load_to)
         glutKeyboardFunc(respond_key_pressed);
         glutTimerFunc(TIMER_INTERVAL * 0, Timer, 0);
         glutMainLoop();
-        if(!load_from_file)
-            fluid_simulation->~owPhysicsFluidSimulator();
+        fluid_simulation->~owPhysicsFluidSimulator();
     }
     else
     {

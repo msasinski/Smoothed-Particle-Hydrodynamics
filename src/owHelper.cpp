@@ -101,7 +101,7 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
     if( !((stage==0)||(stage==1)) ) return 0;
 
     float alpha;
-    float wormBodyRadius;
+    float wormBodyRadius=0;
     int pCount = 0;//total counter of particles being created within this function
     int i,j;
     float *positionVector;
@@ -111,10 +111,10 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
     float zc = ZMAX*0.5f;
     int elasticLayers = 1;//starting value
     float PI = 3.1415926536f;
-    int currSlice_pCount;
-    int prevSlice_pCount;
-    int currSlice_start;
-    int prevSlice_start;
+    int currSlice_pCount=0;
+    int prevSlice_pCount=0;
+    int currSlice_start=0;
+    int prevSlice_start=0;
     int mc = 0;
     float angle;
     int tip = 0;
@@ -487,8 +487,8 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
                                 }
 
                                 membraneData_cpp [mc*3+0] = ii;//i;
-                                membraneData_cpp [mc*3+1] = jj;//array_j[j];
-                                membraneData_cpp [mc*3+2] = kk;//array_j[k];
+                                membraneData_cpp [mc*3+1] = jj;//
+                                membraneData_cpp [mc*3+2] = kk;//
                                 mc++;
                             }
 
@@ -572,8 +572,8 @@ int generateWormShell(int stage, int i_start,float *position_cpp, float *velocit
                                 }
 
                                 membraneData_cpp [mc*3+0] = ii;//i;
-                                membraneData_cpp [mc*3+1] = jj;//array_j[j];
-                                membraneData_cpp [mc*3+2] = kk;//array_j[k];
+                                membraneData_cpp [mc*3+1] = jj;//
+                                membraneData_cpp [mc*3+2] = kk;//
                                 mc++;
                             }
                         }
@@ -761,7 +761,6 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
     int ny = (int)( ( YMAX - YMIN ) / r0 ); //Y
     int nz = (int)( ( ZMAX - ZMIN ) / r0 ); //Z
 
-    int wormIndex_start,wormIndex_end;
     int numOfMembraneParticles = generateWormShell(0,0,position_cpp,velocity_cpp, numOfMembranes, membraneData_cpp);
 
     if(stage==0)
@@ -777,9 +776,7 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
     //=============== create worm body (elastic parts) ==================================================
     if(stage==1)
     {
-        wormIndex_start = i;
         i += generateWormShell(1/*stage*/,i,position_cpp,velocity_cpp, numOfMembranes,membraneData_cpp);
-        wormIndex_end = i;
 
 
         //initialize elastic connections data structure (with NO_PARTICLE_ID values)
@@ -994,12 +991,12 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
         ///////////////debug////////////
         int j;
         int ecc_total = 0;
-        int array_j[MAX_NEIGHBOR_COUNT];
         int muscleCounter = 0;
         int m_index[10640];
         float WXC = XMAX*0.5f;
         float WYC = YMAX*0.3f;
         float WZC = ZMAX*0.5f;
+
         for(i=numOfElasticP-numOfMembraneParticles; i<numOfElasticP; i++)
         {
             float dx2,dy2,dz2,r2_ij,r_ij;
@@ -1415,7 +1412,7 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
 
                                         }
                                     }
-                        array_j[ecc] = j;
+                        //array_j[ecc] = j;
                         ecc++;
                         ecc_total++;
                     }

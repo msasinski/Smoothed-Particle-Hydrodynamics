@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <iostream>
 
-extern bool load_from_file = false;
 
 int main(int argc, char **argv)
 {
@@ -31,12 +30,6 @@ int main(int argc, char **argv)
                 load_to = true;
             }
 
-            //run load config from file mode
-            if(strncmp(argv[i], "-l_from", 7) == 0)
-            {
-                graph = true;
-                load_from_file = true;
-            }
         }
 
         run( argc, argv, graph, load_to);
