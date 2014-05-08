@@ -550,17 +550,19 @@ __kernel void pcisph_computeForcesAndInitPressure(
     int jd;
     float4 sum = (float4)( 0.0f, 0.0f, 0.0f, 0.0f );
     float4 vi,vj;
-    float rho_i,rho_j;
     float4 accel_surfTensForce = (float4)( 0.0f, 0.0f, 0.0f, 0.0f );
 
     do
     {
+
         if( (jd = NEIGHBOR_MAP_ID(neighborMap[ idx + nc])) != NO_PARTICLE_ID )
         {
             r_ij = NEIGHBOR_MAP_DISTANCE( neighborMap[ idx + nc] );
 
             if(r_ij<hScaled)
             {
+                float rho_i;
+                float rho_j;
                 //neighbor_cnt++;
                 rho_i = rho[id];
                 rho_j = rho[jd];
@@ -762,10 +764,10 @@ void computeInteractionWithBoundaryParticles(
         (*pos_).z += delta_pos.z;								//
         if(tangVel) // tangential component of velocity
         {
-            float eps = 0.99f; //eps should be <= 1.0			// controls the friction of the collision
             float vel_n_len = n_c_i.x * (*vel).x + n_c_i.y * (*vel).y + n_c_i.z * (*vel).z;
             if(vel_n_len < 0)
             {
+                float eps = 0.99f; //eps should be <= 1.0			// controls the friction of the collision
                 (*vel).x -= n_c_i.x * vel_n_len;
                 (*vel).y -= n_c_i.y * vel_n_len;
                 (*vel).z -= n_c_i.z * vel_n_len;

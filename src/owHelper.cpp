@@ -752,9 +752,7 @@ int generateInnerWormLiquid(int stage, int i_start,float *position_cpp, float *v
 
 void owHelper::generateConfiguration(int stage, float *position_cpp, float *velocity_cpp, float *& elasticConnectionsData_cpp, int *membraneData_cpp, int & numOfLiquidP, int & numOfElasticP, int & numOfBoundaryP, int & numOfElasticConnections, int & numOfMembranes, int *particleMembranesList_cpp)
 {
-    float p_type = LIQUID_PARTICLE;
     int i = 0;// particle counter
-    int ix,iy,iz;
     int ecc = 0;//elastic connections counter
 
     int nx = (int)( ( XMAX - XMIN ) / r0 ); //X
@@ -805,8 +803,11 @@ void owHelper::generateConfiguration(int stage, float *position_cpp, float *velo
     }
     else if(stage==1)
     {
+        int ix,iy,iz;
+
+        //float p_type = LIQUID_PARTICLE; - scoped from level up
         //===================== create boundary particles ==========================================================
-        p_type = BOUNDARY_PARTICLE;
+        float p_type = BOUNDARY_PARTICLE; 
 
         // 1 - top and bottom
         for(ix=0; ix<nx; ix++)
@@ -1451,9 +1452,10 @@ void owHelper::preLoadConfiguration()
     {
         PARTICLE_COUNT = 0;
         ifstream positionFile ("./configuration/position.txt");
-        float x, y, z, p_type;
         if( positionFile.is_open() )
         {
+            float p_type = 0.0;
+            float x, y, z;
             while( positionFile.good() )
             {
                 p_type = -1.1f;//reinitialize
@@ -1532,9 +1534,9 @@ void owHelper::loadConfiguration(float *position_cpp, float *velocity_cpp, float
             ifstream elasticConectionsFile ("./configuration/elasticconnections.txt");
             elasticConnections = new float[ 4 * numOfElasticP * MAX_NEIGHBOR_COUNT ];
             i = 0;
-            float  jd, rij0, val1, val2;// Elastic connection particle jd - jparticle rij0 - distance between i and j, val1, val2 - doesn't have any useful information yet
             if( elasticConectionsFile.is_open() )
             {
+                float  jd, rij0, val1, val2;// Elastic connection particle jd - jparticle rij0 - distance between i and j, val1, val2 - doesn't have any useful information yet
                 //elasticConectionsFile >> numElasticConnections;
 
                 while( elasticConectionsFile.good())
@@ -1565,6 +1567,9 @@ void owHelper::loadConfigurationFromOneFile(float *position_cpp, float *velocity
     try
     {
         ifstream configurationFile ("./configuration/configuration.txt");
+        if( configurationFile.is_open() )
+        {
+            bool firstString = true;
         int i = 0;
         float x, y, z, p_type = -1.f;
         std::string line;
@@ -1573,9 +1578,6 @@ void owHelper::loadConfigurationFromOneFile(float *position_cpp, float *velocity
         const int isElasticConnectionsBlock = 3;
         int block = 0;
         bool isNotString = true;
-        if( configurationFile.is_open() )
-        {
-            bool firstString = true;
             while( configurationFile.good() && i < PARTICLE_COUNT )
             {
                 std::getline(configurationFile, line);
@@ -1790,88 +1792,9 @@ void owHelper::loadConfigurationFromFile(float *& position, float *& connections
 }
 long position_index = 0;
 ifstream positionFile;
-void owHelper::loadConfigurationFromFile_experemental(float *& position, float *& connections, int *& membranes, int iteration)
-{
-    try
-    {
-        if(iteration == 0)
-            positionFile.open("./buffers/position_buffer.txt");
-        int i = 0;
-        float x, y, z, p_type;
-        if( positionFile.is_open() )
-        {
-            if(iteration == 0)
-            {
-                positionFile >> numOfElasticP;
-                positionFile >> numOfLiquidP;
-                PARTICLE_COUNT = (numOfElasticP + numOfLiquidP);
-                position = new float[4 * PARTICLE_COUNT];
-            }
-            while( positionFile.good() &&  i < PARTICLE_COUNT)
-            {
-                positionFile >> x >> y >> z >> p_type;
-                position[i * 4 + 0] = x;
-                position[i * 4 + 1] = y;
-                position[i * 4 + 2] = z;
-                position[i * 4 + 3] = p_type;
-                i++;
-            }
-        }
-        if(!positionFile.good())
-        {
-            positionFile.close();
-            exit(0);
-        }
-        if(iteration == 0)
-        {
 
-            ifstream connectionFile("./buffers/connection_buffer.txt");
-            connections = new float[MAX_NEIGHBOR_COUNT * numOfElasticP * 4];
-            if( connectionFile.is_open() )
-            {
-                int i = 0;
-                float jd, rij0, val1, val2;
-                while(connectionFile.good() && i < MAX_NEIGHBOR_COUNT * numOfElasticP)
-                {
-                    connectionFile >> jd >> rij0 >> val1 >> val2;
-                    connections[ 4 * i + 0 ] = jd;
-                    connections[ 4 * i + 1 ] = rij0;
-                    connections[ 4 * i + 2 ] = val1;
-                    connections[ 4 * i + 3 ] = val2;
-                    i++;
-                }
-            }
-            connectionFile.close();
-            ifstream membranesFile("./buffers/membranes_buffer.txt");
-            if(membranesFile.is_open())
-            {
-                int m_count = 0;
-                membranesFile >> m_count;
-                int i = 0;
-                membranes = new int[4 * m_count];
-                while(membranesFile.good() && i < m_count)
-                {
-                    membranesFile >> membranes[4 * i + 0] >> membranes[4 * i + 1] >> membranes[4 * i + 2] >> membranes[4 * i + 3];
-                    i++;
-                }
-            }
-            membranesFile.close();
-        }
-    }
-    catch(std::exception &e)
-    {
-        std::cout << "ERROR: " << e.what() << std::endl;
-        exit( -1 );
-    }
-}
 void owHelper::watch_report( const char * str )
 {
-#if defined(_WIN32) || defined(_WIN64)
-    QueryPerformanceCounter(&t2);
-    printf(str,(t2.QuadPart - t1.QuadPart) * 1000.0 / frequency.QuadPart);
-    t1 = t2;
-    elapsedTime = (t2.QuadPart - t0.QuadPart) * 1000.0 / frequency.QuadPart;
-#elif defined(__linux__)
     clock_gettime(CLOCK_MONOTONIC_RAW, &t2);
     time_t sec = t2.tv_sec - t1.tv_sec;
     long nsec;
@@ -1887,20 +1810,4 @@ void owHelper::watch_report( const char * str )
     printf(str,(float)sec * 1000.f + (float)nsec/1000000.f);
     t1 = t2;
     elapsedTime =  (float)(t2.tv_sec - t0.tv_sec) * 1000.f + (float)(t2.tv_nsec - t0.tv_nsec)/1000000.f;
-#elif defined(__APPLE__)
-    uint64_t elapsedNano;
-    static mach_timebase_info_data_t    sTimebaseInfo;
-
-    if ( sTimebaseInfo.denom == 0 )
-    {
-        (void) mach_timebase_info(&sTimebaseInfo);
-    }
-
-    t2 = mach_absolute_time();
-    elapsedNano = (t2-t1) * sTimebaseInfo.numer / sTimebaseInfo.denom;
-    printf(str, (float)elapsedNano/1000000.f );
-    t1=t2;
-    elapsedNano = (t2-t0) * sTimebaseInfo.numer / sTimebaseInfo.denom;
-    elapsedTime = (float)elapsedNano/1000000.f;
-#endif
 }

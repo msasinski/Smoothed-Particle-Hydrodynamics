@@ -205,15 +205,7 @@ void owOpenCLSolver::initializeOpenCL()
     std::string programSource( std::istreambuf_iterator<char>( file ), ( std::istreambuf_iterator<char>() ));
     cl::Program::Sources source( 1, std::make_pair( programSource.c_str(), programSource.length()+1 ));
     program = cl::Program( context, source );
-#if defined(__APPLE__)
-    err = program.build( devices, "-g -cl-opt-disable" );
-#else
-#if INTEL_OPENCL_DEBUG
-    err = program.build( devices, OPENCL_DEBUG_PROGRAM_PATH +  "-g -cl-opt-disable");
-#else
     err = program.build( devices, "-g -cl-opt-disable");
-#endif
-#endif
     if( err != CL_SUCCESS )
     {
         std::string compilationErrors;
@@ -341,17 +333,8 @@ unsigned int owOpenCLSolver::_runFindNeighbors()
     findNeighbors.setArg( 14, PARTICLE_COUNT );
     int err = queue.enqueueNDRangeKernel(
                   findNeighbors, cl::NullRange, cl::NDRange( (int) ( PARTICLE_COUNT_RoundedUp ) ),
-#if defined( __APPLE__ )
-                  cl::NullRange, NULL, NULL );/*
-		local_work_size can also be a NULL
-		value in which case the OpenCL implementation will
-		determine how to be break the global work-items
-		into appropriate work-group instances.
-		http://www.khronos.org/registry/cl/specs/opencl-1.0.43.pdf, page 109
-		*/
-#else
                   cl::NDRange( (int)( local_NDRange_size ) ), NULL, NULL );
-#endif
+
 #if QUEUE_EACH_KERNEL
     queue.finish();
 #endif
@@ -376,11 +359,7 @@ unsigned int owOpenCLSolver::_run_pcisph_computeDensity()
     pcisph_computeDensity.setArg(12, PARTICLE_COUNT );
     int err = queue.enqueueNDRangeKernel(
                   pcisph_computeDensity, cl::NullRange, cl::NDRange( (int) ( PARTICLE_COUNT_RoundedUp ) ),
-#if defined( __APPLE__ )
-                  cl::NullRange, NULL, NULL );
-#else
                   cl::NDRange( (int)( local_NDRange_size ) ), NULL, NULL );
-#endif
 #if QUEUE_EACH_KERNEL
     queue.finish();
 #endif
@@ -496,11 +475,7 @@ unsigned int owOpenCLSolver::_run_pcisph_predictDensity()
     pcisph_predictDensity.setArg(12, PARTICLE_COUNT );
     int err = queue.enqueueNDRangeKernel(
                   pcisph_predictDensity, cl::NullRange, cl::NDRange( (int) ( PARTICLE_COUNT_RoundedUp ) ),
-#if defined( __APPLE__ )
-                  cl::NullRange, NULL, NULL );
-#else
                   cl::NDRange( (int)( local_NDRange_size ) ), NULL, NULL );
-#endif
 #if QUEUE_EACH_KERNEL
     queue.finish();
 #endif

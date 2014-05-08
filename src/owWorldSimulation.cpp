@@ -451,9 +451,9 @@ void renderInfo(int x, int y)
 {
     beginWinCoords();
     int y_m = y;
-    int i_shift = 0;
     if(showInfo)
     {
+        int i_shift = 0;
         glColor3f (0.5F, 1.0F, 1.0F);
         sprintf(label,"Liquid particles: %d, elastic matter particles: %d, boundary particles: %d; total count: %d", numOfLiquidP,
                 numOfElasticP,
@@ -723,9 +723,9 @@ extern float *muscle_activation_signal_cpp;
 
 void respond_key_pressed(unsigned char key, int x, int y)
 {
-    int shift=0;
     {
 
+        int shift=0;
         if(key=='1')
         {
             if(muscle_activation_signal_cpp[0+shift]<=0.5f)
