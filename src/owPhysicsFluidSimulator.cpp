@@ -3,16 +3,15 @@
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
-#include "sph.h"
 
 float calcDelta();
 extern const float delta = calcDelta();
-extern int iterationCount=0;
-extern int numOfElasticConnections = 0;
-extern int numOfLiquidP = 0;
-extern int numOfElasticP = 0;
+int iterationCount=0;
+int numOfElasticConnections=0; 
+int numOfLiquidP = 0;
+int numOfElasticP = 0;
 int numOfBoundaryP = 0;
-extern int numOfMembranes = 0;
+int numOfMembranes = 0;
 int * _particleIndex;
 unsigned int * gridNextNonEmptyCellBuffer;
 extern int gridCellCount;
@@ -32,14 +31,8 @@ owPhysicsFluidSimulator::owPhysicsFluidSimulator(owHelper * helper)
 
     try
     {
-        if(generateInitialConfiguration)
             // GENERATE THE SCENE
             owHelper::generateConfiguration(0, position_cpp, velocity_cpp, elasticConnectionsData_cpp, membraneData_cpp, numOfLiquidP, numOfElasticP, numOfBoundaryP, numOfElasticConnections, numOfMembranes, particleMembranesList_cpp);
-        else
-            // LOAD FROM FILE
-            owHelper::preLoadConfiguration();
-        //mv
-        //=======================
 
         position_cpp = new float[ 4 * PARTICLE_COUNT ];
         velocity_cpp = new float[ 4 * PARTICLE_COUNT ];
@@ -61,12 +54,7 @@ owPhysicsFluidSimulator::owPhysicsFluidSimulator(owHelper * helper)
         particleIndex_cpp = new unsigned int[PARTICLE_COUNT * 2];
         acceleration_cpp = new float[PARTICLE_COUNT * 4];//TODO REMOVE IT AFTER FIXING
 
-        if(generateInitialConfiguration)
-            // GENERATE THE SCENE
             owHelper::generateConfiguration(1,position_cpp, velocity_cpp, elasticConnectionsData_cpp, membraneData_cpp, numOfLiquidP, numOfElasticP, numOfBoundaryP, numOfElasticConnections, numOfMembranes, particleMembranesList_cpp );
-        else
-            // LOAD FROM FILE
-            owHelper::loadConfiguration( position_cpp, velocity_cpp, elasticConnectionsData_cpp, numOfLiquidP, numOfElasticP, numOfBoundaryP, numOfElasticConnections );		//Load configuration from file to buffer
 
         if(numOfElasticP != 0)
         {
