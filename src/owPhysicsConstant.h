@@ -5,16 +5,13 @@
 #include <math.h>
 
 #ifndef M_PI
-#define M_PI 3.1415927f
+const float M_PI = 3.1415927f;
 #endif
 
 
 const float rho0 = 1000.0f;
 const float mass = 3.25e-14f;// kg // we need 3.25e-14 kg
-//const float mass = 3.25e-08f;
 const float timeStep = 5.0e-06f;// s // ATTENTION! too large values can lead to 'explosion' of elastic matter objects
-//const float timeStep = 0.2e-04f;
-//const float timeStep = 1.0e-02f;
 
 const float simulationScale = 0.004f*pow(mass,1.f/3.f)/pow(0.00025f,1.f/3.f);
 
@@ -29,14 +26,12 @@ const float r0 = 0.5f * h; // distance between two boundary particle == equilibr
 
 //Sizes of the box containing simulated 'world'
 //Sizes choice is realized this way because it should be proportional to smoothing radius h
-#define XMIN 0
+const unsigned int XMIN = 0;
 #define XMAX 30.0*h // horizontal 1
 #define YMIN 0
 #define YMAX 20.0*h // vertical
 #define ZMIN 0
 #define ZMAX 250.0*h // horizontal 2 //142
-
-//const float h_fall = simulationScale*(YMAX-YMIN)*0.454f;
 
 // Some facts about C. elegans:
 // Adult worm mass = 3.25e-06 grams = 3.25e-09 kg

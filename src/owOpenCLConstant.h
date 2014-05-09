@@ -1,20 +1,18 @@
 #ifndef OW_OPENCL_CONSTANT_H
 #define OW_OPENCL_CONSTANT_H
 
-#define MAX_NEIGHBOR_COUNT 32
+const int MAX_NEIGHBOR_COUNT = 32;
 
-#define MAX_MEMBRANES_INCLUDING_SAME_PARTICLE 7
+const int MAX_MEMBRANES_INCLUDING_SAME_PARTICLE = 7;
 
-#define LIQUID_PARTICLE 1
-#define ELASTIC_PARTICLE 2
-#define BOUNDARY_PARTICLE 3
+const unsigned int LIQUID_PARTICLE = 1;
+const unsigned int ELASTIC_PARTICLE = 2;
+const unsigned int BOUNDARY_PARTICLE = 3;
 
-#define NO_PARTICLE_ID -1
-#define NO_CELL_ID -1
-#define NO_DISTANCE -1.0f
+const int NO_PARTICLE_ID = -1;
+const int NO_CELL_ID = -1;
+const float NO_DISTANCE = -1.0f;
+const bool QUEUE_EACH_KERNEL = true;
 
-#define QUEUE_EACH_KERNEL 1
-
-#define INTEL_OPENCL_DEBUG 0
 
 #endif // #ifndef OW_OPENCL_CONSTANT_H
