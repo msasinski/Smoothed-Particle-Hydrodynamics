@@ -418,7 +418,9 @@ __kernel void indexx(
         bool zeroCase = ( idx == 0 && isMiddle );
         int sampleM1CellId = zeroCase ? -1 : PI_CELL_ID( sampleMinus1 );
         converged = isMiddle && ( zeroCase || sampleM1CellId < sampleCellId );
-        cellIndex = converged ? idx : cellIndex;
+        if(converged)
+          cellIndex = idx;
+
         high = ( isMiddle && !converged ) ? idx - 1 : high;
     }//while
 
