@@ -28,6 +28,6 @@ private:
     double elapsedTime;
     timespec t0, t1, t2;
     timespec t3,t4;
-    double us;
+    //double us;
 };
 #endif // #ifndef OW_HELPER_H

@@ -15,10 +15,6 @@ public:
     {
         return position_cpp;
     };
-    float * getvelocity_cpp()
-    {
-        return velocity_cpp;
-    };
     float * getDensity_cpp()
     {
         ocl_solver->read_density_buffer( density_cpp );

@@ -102,38 +102,6 @@ public:
         return sqrt(x*x + y*y + z*z);
     }
 
-    void unitize()								// unitize() normalizes this Vector3D that its direction remains the same but its length is 1.
-    {
-        double length = this->length();
-
-        if (length == 0)
-            return;
-
-        x /= length;
-        y /= length;
-        z /= length;
-    }
-
-    Vector3D unit() const						// unit() returns a new Vector3D. The returned value is a unitized version of this Vector3D.
-    {
-        double length = this->length();
-
-        if (length == 0)
-            return *this;
-
-        return Vector3D(x / length, y / length, z / length);
-    }
-
-    double scaleM(const Vector3D &vec) const
-    {
-        return x * vec.x + y * vec.y + z * vec.z;
-    }
-
-    double getLengthSq_fast() const
-    {
-        return x*x + y*y + z*z;
-    }
-
     double operator*(const Vector3D &v) const
     {
         return x*v.x + y*v.y + z*v.z;
@@ -156,21 +124,6 @@ public:
             return false;
     }
 
-    static Vector3D RotateVector1AroundVector2(const Vector3D &v1, const Vector3D &v2 ,double alpha)
-    {
-        if(v1==v2) return v1;
-
-        Vector3D ort1,ort2,ort3;
-
-        //alpha = 5;
-
-        alpha*=(float)PI/180.0f;
-
-        ort1 = v2.unit();
-        ort2 = (v1%v2).unit();
-        ort3 = (ort2%ort1).unit();
-        return ort1*(v1*ort1) + ort2*(v1*ort3)*sin(alpha) + ort3*(v1*ort3)*cos(alpha);
-    }
 };
 
 

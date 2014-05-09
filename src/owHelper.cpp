@@ -32,6 +32,7 @@ struct pos
 std::vector<pos> f_data;
 owHelper::owHelper(void)
 {
+    elapsedTime = 0;
     refreshTime();
 }
 

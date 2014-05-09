@@ -874,13 +874,6 @@ void init(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
-void draw(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPushMatrix();
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glPopMatrix();
-}
 
 void run(int argc, char** argv, const bool with_graphics, const bool load_to)
 {

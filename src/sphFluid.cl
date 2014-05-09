@@ -70,7 +70,6 @@ __kernel void clearBuffers(
     __global float4 * nm = (__global float4 *)neighborMap;
     int outIdx = ( id * MAX_NEIGHBOR_COUNT ) >> 1;//int4 versus int2 addressing
     float4 fdata = (float4)( -1, -1, -1, -1 );
-    int i,j,k,mnl;//mnl = membrane number in the list. 0..MAX_MEMBRANES_INCLUDING_SAME_PARTICLE-1
 
     nm[ outIdx++ ] = fdata;
     nm[ outIdx++ ] = fdata;
@@ -437,10 +436,7 @@ __kernel void sortPostPass(
 )
 {
     int id = get_global_id( 0 );
-    if(id==3500)
-    {
-        id = id;
-    }
+
     if( id >= PARTICLE_COUNT ) return;
     uint2 spi = particleIndex[ id ];//contains id of cell and id of particle it has sorted
     int serialId = PI_SERIAL_ID( spi );//get a particle Index
@@ -541,7 +537,6 @@ __kernel void pcisph_computeForcesAndInitPressure(
     }
     int idx = id * MAX_NEIGHBOR_COUNT;
     float hScaled = h * simulationScale;
-    float hScaled2 = hScaled*hScaled;//29aug_A.Palyanov
 
     float4 acceleration_i;
     float2 nm;
@@ -561,22 +556,11 @@ __kernel void pcisph_computeForcesAndInitPressure(
 
             if(r_ij<hScaled)
             {
-                float rho_i;
-                float rho_j;
-                //neighbor_cnt++;
-                rho_i = rho[id];
-                rho_j = rho[jd];
+                //rho_i = rho[id];
+                //rho_j = rho[jd];
                 vi = sortedVelocity[id];
                 vj = sortedVelocity[jd];
                 sum += (sortedVelocity[jd]-sortedVelocity[id])*(hScaled-r_ij)/rho[jd];
-                //29aug_A.Palyanov_start_block
-                // M.Beckner & M.Teschner / Weakly compressible SPH for free surface flows. 2007.
-                //normalVector += sortedPosition[id]-sortedPosition[jd];
-                //	-0.3f * (sortedPosition[id]-sortedPosition[jd])*simulationScale * pow(hScaled2/2/*-r_ij*r_ij*/,3);
-                //29aug_A.Palyanov_end_block
-                //0.09 for experiments with water drops
-                //-0.0133
-                // surface tension force
                 accel_surfTensForce += surfTensCoeff * (sortedPosition[id]-sortedPosition[jd]);
             }
         }
@@ -586,7 +570,6 @@ __kernel void pcisph_computeForcesAndInitPressure(
 
     accel_surfTensForce.w = 0.f;
 
-    // mu = viscosity
 
     sum *= (float)(mass * mu) * (float)(del2WviscosityCoefficient/rho[id]);
 
@@ -642,7 +625,6 @@ __kernel void pcisph_computeElasticForces(
     float4 vect_r_ij;
     float4 centerOfMassVelocity;
     float4 velocity_i_cm;
-    float check;
     float4 proj_v_i_cm_on_r_ij;
     float4 velocity_i = velocity[id];//velocity[ index + offset ];
     float4 velocity_j;
@@ -912,8 +894,6 @@ __kernel void pcisph_correctPressure(
     int id = get_global_id( 0 );
     if( id >= PARTICLE_COUNT ) return;
     id = particleIndexBack[id];//track selected particle (indices are not shuffled anymore)
-    int idx = id * MAX_NEIGHBOR_COUNT;
-    int nc = 0;// neigbor counter
     float rho_err;
     float p_corr;
 
@@ -958,14 +938,11 @@ __kernel void pcisph_computePressureForceAcceleration(
     int idx = id * MAX_NEIGHBOR_COUNT;
     float hScaled = h * simulationScale;
 
-    float pressure_i  = pressure[ id ];
-    float rho_i		  = rho[ PARTICLE_COUNT+id ];
-
     float4 result = (float4)( 0.0f, 0.0f, 0.0f, 0.0f );
 
     int nc=0;
     float4 gradW_ij;
-    float r_ij,rho_err;
+    float r_ij;
     float4 vr_ij;
     int jd;
     float value;
@@ -1097,18 +1074,6 @@ float4 calculateProjectionOfPointToPlane(float4 ps, float4 pa, float4 pb, float4
     return pm;
 }
 
-float calculateTriangleSquare(float4 v1, float4 v2, float4 v3)
-{
-    // here 'v' is for vertex or vector, anyway v1, v2, v3 are coordinates of 3 points in 3D.
-    // 4-th coordinate is not used
-    // first calc 2 vectors: v21 and v31
-    float4 a = v2 - v1;//v21
-    float4 b = v3 - v1;//v31
-    //vector product of them
-    float4 ab = (float4)(a.y*b.z-a.z*b.y, a.z*b.x-a.x*b.z, a.x*b.y-a.y*b.x, 0);
-    return sqrt(ab.x*ab.x+ab.y*ab.y+ab.z*ab.z)/2.f;
-}
-
 __kernel void computeInteractionWithMembranes(
     __global float4 * position,
     __global float4 * velocity,
@@ -1130,7 +1095,6 @@ __kernel void computeInteractionWithMembranes(
     int id_source_particle = PI_SERIAL_ID( particleIndex[id] );
     int jd_source_particle;
 
-    //float4 position_ = sortedPosition[ id ];
     float4 position_ = position[ id ];
 
     if((int)(position[ id_source_particle ].w) == BOUNDARY_PARTICLE) return;
@@ -1141,7 +1105,6 @@ __kernel void computeInteractionWithMembranes(
     int jd, idx = id * MAX_NEIGHBOR_COUNT;
     int mdi;//membraneData index
     int i,j,k;//these i and j have nothing in common with id and jd indexes
-    int i_sp,j_sp,k_sp;
     float4 pos_i,pos_j,pos_k;
     float4 pos_p;//position of id-particle projection on membrane plane;
     float4 normal_to_ijk_plane;
@@ -1158,7 +1121,6 @@ __kernel void computeInteractionWithMembranes(
     for(i=0; i<MAX_NEIGHBOR_COUNT; i++)
     {
         membrane_jd_normal_vector[i] = (float4)(0,0,0,0);
-        //membrane_jd[i] = -1;
     }
 
     //check all neighbours of each particle to find those which belong to membranes.
@@ -1320,9 +1282,7 @@ __kernel void computeInteractionWithMembranes_finalize(
     id = particleIndexBack[id];
 
     int id_source_particle = PI_SERIAL_ID( particleIndex[id] );
-    int jd_source_particle;
     float4 position_ = position[ id ];
-    float v2;
 
     if((int)(position[ id_source_particle ].w) == BOUNDARY_PARTICLE) return;
     //!!! interacting with membranes
