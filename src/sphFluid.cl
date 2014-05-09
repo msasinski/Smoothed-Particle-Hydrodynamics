@@ -2,7 +2,6 @@
 // "Particle-based fluid simulation for interactive applications", Muller, Charypar & Gross,
 // Eurographics/SIGGRAPH Symposium on Computer Animation (2003).
 
-
 #ifndef OW_OPENCL_CONSTANT_H
 #define OW_OPENCL_CONSTANT_H
 

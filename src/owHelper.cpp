@@ -1689,7 +1689,7 @@ void owHelper::loadConfigurationToFile(float * position, float * connections, in
         }
         for(int i=0; i < PARTICLE_COUNT; i++)
         {
-            if((int)position[ 4 * i + 3] != BOUNDARY_PARTICLE)
+            if((unsigned int)position[ 4 * i + 3] != BOUNDARY_PARTICLE)
             {
                 positionFile << position[i * 4 + 0] << "\t" << position[i * 4 + 1] << "\t" << position[i * 4 + 2] << "\t" << position[i * 4 + 3] << "\n";
             }
