@@ -204,7 +204,7 @@ void owOpenCLSolver::initializeOpenCL()
     std::string programSource( std::istreambuf_iterator<char>( file ), ( std::istreambuf_iterator<char>() ));
     cl::Program::Sources source( 1, std::make_pair( programSource.c_str(), programSource.length()+1 ));
     program = cl::Program( context, source );
-    err = program.build( devices, "-g -cl-opt-disable");
+    err = program.build( devices, "");
     if( err != CL_SUCCESS )
     {
         std::string compilationErrors;
